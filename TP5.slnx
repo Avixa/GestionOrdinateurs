@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="AuthentificationApi/AuthentificationApi.csproj" />
+  <Project Path="TP5.API/TP5.API.csproj" />
+  <Project Path="TP5.Client/TP5.Client.csproj" />
+  <Project Path="TP5.Gateway/TP5.Gateway.csproj" />
+  <Project Path="TP5.Shared/TP5.Shared.csproj" />
+  <Project Path="TP5.Tests/TP5.Tests.csproj" />
+</Solution>

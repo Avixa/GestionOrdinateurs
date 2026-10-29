@@ -1,0 +1,51 @@
+@page "/ordinateurs"
+@inject IOrdinateurApiService OrdinateurApiService
+
+<PageTitle>Ordinateurs</PageTitle>
+
+<h1>Liste des ordinateurs</h1>
+
+@if (erreur)
+{
+    <p class="text-danger">Impossible de charger les ordinateurs.</p>
+}
+else if (ordinateurs == null)
+{
+    <p>Chargement...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Devise</th>
+                <th>Vendu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ordinateur in ordinateurs)
+            {
+                <tr>
+                    <td>@ordinateur.Nom</td>
+                    <td>@ordinateur.Prix</td>
+                    <!-- le prix de base est en euros -->
+                    <td>EUR</td>
+                    <td>@(ordinateur.Vendu ? "Oui" : "Non")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Ordinateur>? ordinateurs;
+    private bool erreur = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordinateurs = await OrdinateurApiService.GetOrdinateursAsync();
+        erreur = ordinateurs == null;
+    }
+}

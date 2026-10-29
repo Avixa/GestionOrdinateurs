@@ -1,0 +1,51 @@
+@page "/login"
+@inject IAuthApiService AuthApiService
+@inject ISessionStorageService SessionStorage
+@inject NavigationManager Navigation
+
+<PageTitle>Connexion</PageTitle>
+
+<h1>Connexion</h1>
+
+<div class="mb-3">
+    <label class="form-label">Utilisateur</label>
+    <input class="form-control" @bind="login" />
+</div>
+
+<button class="btn btn-primary" @onclick="SeConnecter">Connecter</button>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p class="text-danger mt-3">@message</p>
+}
+
+@code {
+    // login saisi
+    private string login = string.Empty;
+
+    // message d'erreur sous le bouton
+    private string message = string.Empty;
+
+    private async Task SeConnecter()
+    {
+        message = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(login))
+        {
+            message = "Saisis un login";
+            return;
+        }
+
+        // verifie l'utilisateur et genere le token
+        var token = await AuthApiService.GetTokenAsync(login);
+        if (token == null)
+        {
+            message = $"L'utilisateur {login} n'existe pas";
+            return;
+        }
+
+        // on enregistre le token en session et on retourne a l'accueil
+        await SessionStorage.SetItemAsStringAsync("authToken", token);
+        Navigation.NavigateTo("/");
+    }
+}

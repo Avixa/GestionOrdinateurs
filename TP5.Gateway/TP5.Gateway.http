@@ -1,0 +1,6 @@
+@TP5.Gateway_HostAddress = http://localhost:5229
+
+GET {{TP5.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

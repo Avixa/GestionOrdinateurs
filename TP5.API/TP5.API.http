@@ -1,0 +1,6 @@
+@TP5.API_HostAddress = http://localhost:5108
+
+GET {{TP5.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

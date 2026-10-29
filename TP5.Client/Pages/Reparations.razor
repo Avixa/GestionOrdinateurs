@@ -1,0 +1,50 @@
+@page "/reparations"
+@inject IReparationApiService ReparationApiService
+
+<PageTitle>Réparations</PageTitle>
+
+<h1>Historique des réparations</h1>
+
+@if (erreur)
+{
+    <p class="text-danger">Impossible de charger l'historique.</p>
+}
+else if (historique == null)
+{
+    <p>Chargement...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ordinateur</th>
+                <th>Technicien</th>
+                <th>Type</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reparation in historique)
+            {
+                <tr>
+                    <td>@reparation.NomOrdinateur</td>
+                    <td>@reparation.Technicien</td>
+                    <td>@reparation.TypeReparation</td>
+                    <td>@reparation.DateIntervention.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<HistoriqueReparationRecord>? historique;
+    private bool erreur = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        historique = await ReparationApiService.GetHistoriqueAsync();
+        erreur = historique == null;
+    }
+}
