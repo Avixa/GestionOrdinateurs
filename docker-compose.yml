@@ -1,0 +1,114 @@
+services:
+
+  # Base PG SQL
+  postgres:
+    image: postgres:15
+    container_name: postgres_db_tp6
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: GestionOrdinateursDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - appnet
+
+  # Serveur d'authentification
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    command: start-dev
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - appnet
+
+  # API d'authentification
+  authentification-api:
+    image: ${DOCKER_ACCOUNT}/authentificationapi:latest
+    build:
+      context: .
+      dockerfile: AuthentificationApi/Dockerfile
+    container_name: authentification_api
+    ports:
+      - "5299:5299"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5299
+    depends_on:
+      - postgres
+      - keycloak
+      - gestionordinateurs-api
+    networks:
+      - appnet
+
+  # API principale
+  gestionordinateurs-api:
+    image: ${DOCKER_ACCOUNT}/gestionordinateurs-api:latest
+    build:
+      context: .
+      dockerfile: TP5.API/Dockerfile
+    container_name: gestionordinateurs_api
+    ports:
+      - "5108:5108"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5108
+    depends_on:
+      - keycloak
+    networks:
+      - appnet
+
+  # Gateway 
+  gestionordinateurs-gateway:
+    image: ${DOCKER_ACCOUNT}/gestionordinateurs-gateway:latest
+    build:
+      context: .
+      dockerfile: TP5.Gateway/Dockerfile
+    container_name: gestionordinateurs_gateway
+    ports:
+      - "5010:5010"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5010
+    depends_on:
+      - gestionordinateurs-api
+    networks:
+      - appnet
+
+  # Front Blazor
+  gestionordinateurs-client:
+    image: ${DOCKER_ACCOUNT}/gestionordinateurs-client:latest
+    build:
+      context: .
+      dockerfile: TP5.Client/Dockerfile
+    container_name: gestionordinateurs_client
+    ports:
+      - "5000:5000"
+    depends_on:
+      - gestionordinateurs-gateway
+      - authentification-api
+    networks:
+      - appnet
+
+# garde les data de pg et keycloak entre deux redemarrages
+volumes:
+  postgres_data:
+  keycloak_data:
+
+# le reseau commun
+networks:
+  appnet:
