@@ -24,4 +24,10 @@
     <ProjectReference Include="..\TP5.Shared\TP5.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="parcinfo.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -29,7 +29,7 @@ public class AuthenticationController : ControllerBase
     {
         // get les infos de l'user dans l'api
         var client = _httpClientFactory.CreateClient();
-        var response = await client.GetAsync($"http://gestionordinateurs-api:5108/api/Users/login/{login}");
+        var response = await client.GetAsync($"http://gestionordinateurs-api:5108/api/Users/{login}");
 
         // 'utilisateur n'existe pas
         if (!response.IsSuccessStatusCode)
